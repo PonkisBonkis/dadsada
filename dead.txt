@@ -1,0 +1,149 @@
+// ==UserScript==
+// @name         Ponki's FPS & Ping Counter
+// @namespace    httptampermonkey.net
+// @version      1.5
+// @description  Ponki's FPS and Ping Counter
+// @author       Ponki
+// @match        https://famishs.io/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+  'use strict';
+
+  alert("Press / to activate the FPS Counter");
+  alert("Press | to change the color of the FPS Counter");
+  alert("Press } to change the background of the Counter");
+  alert("Press Arrow keys to move the FPS Counter");
+
+  var fpsCounter = document.createElement('div');
+  fpsCounter.style.position = 'fixed';
+  fpsCounter.style.top = '65px';
+  fpsCounter.style.left = '2125px';
+  fpsCounter.style.padding = '10px';
+  fpsCounter.style.backgroundColor = 'transparent';
+  fpsCounter.style.color = 'black';
+  fpsCounter.style.fontFamily = 'Baloo Paaji';
+  fpsCounter.style.fontSize = '40px';
+  document.body.appendChild(fpsCounter);
+
+  var pingCounter = document.createElement('div');
+  pingCounter.style.position = 'fixed';
+  pingCounter.style.top = '120px';
+  pingCounter.style.left = '2125px';
+  pingCounter.style.padding = '10px';
+  pingCounter.style.backgroundColor = 'transparent';
+  pingCounter.style.color = 'black';
+  pingCounter.style.fontFamily = 'Baloo Paaji';
+  pingCounter.style.fontSize = '40px';
+  document.body.appendChild(pingCounter);
+
+  var frameCount = 0;
+  var fps = 0;
+  var lastTime = performance.now();
+  var isActive = false;
+
+  function updateFPSCounter() {
+    var currentTime = performance.now();
+    frameCount++;
+
+    if (currentTime - lastTime >= 1000) {
+      fps = frameCount;
+      frameCount = 0;
+      lastTime = currentTime;
+    }
+
+    if (isActive) {
+      fpsCounter.style.display = 'block';
+      fpsCounter.innerHTML = 'FPS: ' + fps;
+    } else {
+      fpsCounter.style.display = 'none';
+    }
+
+    requestAnimationFrame(updateFPSCounter);
+  }
+
+  function toggleFPSCounter() {
+    isActive = !isActive;
+
+    if (isActive) {
+      updateFPSCounter();
+    }
+  }
+
+  function changeFPSCounterColor(color) {
+    fpsCounter.style.color = color;
+  }
+
+  function changeFPSCounterBackground(color) {
+    fpsCounter.style.backgroundColor = color;
+  }
+
+  function moveFPSCounter(direction) {
+    var currentPosition = fpsCounter.getBoundingClientRect();
+
+    var top = currentPosition.top;
+    var left = currentPosition.left;
+
+    if (direction === 'up') {
+      top -= 10;
+    } else if (direction === 'down') {
+      top += 10;
+    } else if (direction === 'left') {
+      left -= 10;
+    } else if (direction === 'right') {
+      left += 10;
+    }
+
+    fpsCounter.style.top = top + 'px';
+    fpsCounter.style.left = left + 'px';
+  }
+
+  function getPing() {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        var pingTime = xhr.responseText;
+        pingCounter.innerHTML = 'Ping: ' + pingTime + 'ms';
+      }
+    };
+    xhr.open("GET", "/ping", true);
+    xhr.send();
+  }
+
+  setInterval(getPing, 3000); // Adjust the interval (in milliseconds) as needed
+
+  document.addEventListener('keydown', function(event) {
+    if (event.key === '/') {
+      toggleFPSCounter();
+    }
+  });
+
+  document.addEventListener('keydown', function(event) {
+    if (event.key === '|') {
+      var color = prompt('Color Hex Code or Color Name (e.g., #FF0000 or red):');
+      changeFPSCounterColor(color);
+    }
+  });
+
+  document.addEventListener('keydown', function(event) {
+    if (event.key === '}') {
+      var color = prompt('Hex Code or Color Name (Transparent for no background):');
+      changeFPSCounterBackground(color);
+    }
+  });
+
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'ArrowUp') {
+      moveFPSCounter('up');
+    } else if (event.key === 'ArrowDown') {
+      moveFPSCounter('down');
+    } else if (event.key === 'ArrowLeft') {
+      moveFPSCounter('left');
+    } else if (event.key === 'ArrowRight') {
+      moveFPSCounter('right');
+    }
+  });
+
+  updateFPSCounter();
+})();
