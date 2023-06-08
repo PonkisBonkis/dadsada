@@ -1,0 +1,39 @@
+// ==UserScript==
+// @name         Auto Trashtalk
+// @version      1.0
+// @description  Ponki
+// @author       Ponki
+// @match        https://famishs.io/
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=famishs.io
+// @grant        none
+// ==/UserScript==
+
+let scriptRunning = false;
+let intervalId;
+
+function startScript() {
+    if (!scriptRunning) {
+        scriptRunning = true;
+        const messages = ["Ur Bad", "Ur a queer", "ME>YOU", "Kys fagboy", "UR DOG", "I raped your pet turtle", "ME>YOU", "your black", "dog eater", "motherfucker", "You watch zootopia porn", "3rd party is gay", "i need more insults", "No Parents?"]; 
+        intervalId = setInterval(() => {
+            client.send_chat(messages[Math.floor(messages.length * Math.random())]);
+        }, 2000);
+    }
+}
+
+function stopScript() {
+    if (scriptRunning) {
+        scriptRunning = false;
+        clearInterval(intervalId);
+    }
+}
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === '}') {
+        if (scriptRunning) {
+            stopScript();
+        } else {
+            startScript();
+        }
+    }
+});
